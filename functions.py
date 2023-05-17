@@ -13,13 +13,14 @@ def write_todos(todos_arg, filepath=FILEPATH):
     with open(filepath, 'w') as file:
         file.writelines(todos_arg)
 
-#__name__ is actually the string "__main__" you get when you run functions.py directly
+# __name__ is actually the string "__main__" you get when you run functions.py directly
 # if you run TodoApp the value of __name__ is "functions" file name
 # so, if run the functions.py file directly, suddenly __name__ then equals == __main__,
 # making the below if statement true, and printing out the following print statements
 # this is useful when testing web applications, to test different outputs in the code whilst
 # leaving the main file untouched
+
+
 if __name__ == "__main__":
     print("Hello")
     print(get_todos())
-
