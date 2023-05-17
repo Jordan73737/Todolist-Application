@@ -1,77 +1,77 @@
-todolist = []
+# from functions import get_todos, write_todos
+import functions
+import time
+
+now = time.strftime("%b %d, %Y %H:%M:%S")
+print("It is", now)
+
 
 while True:
     # Get user input and strip space characters from it
     user_action = input("Type add, show, edit, complete or exit: ")
     user_action = user_action.strip()
 
-    if user_action == "add":
-            todo = input("Enter a todo: ") + "\n" #break line
+    if user_action.startswith("add"):
+        todo = user_action[4:]
 
-            #we could use the following 3 lines but instead we will use 'with'
-            #file = open('todolist.txt', 'r')
-            #todolist = file.readlines()
-            #file.close()
+        todolist = functions.get_todos()
 
-            #using the with context manager we do not need to write the close file line
-            with open('todolist.txt', 'r') as file:
-                todolist = file.readlines()
+        todolist.append(todo + '\n')
 
-            todolist.append(todo)
+        functions.write_todos(todolist)
 
-            with open('todolist.txt', 'w') as file:
-                file.writelines(todolist)
+    elif user_action.startswith("show"):
 
-    elif user_action == "show":
+        todolist = functions.get_todos()
 
-            with open('todolist.txt', "r") as file:
-                todolist = file.readlines()
+        for index, item in enumerate(todolist):
+            item = item.strip('\n')
+            # to be more client friendly we say index starts with 1
+            row = f"{index + 1}.{item.capitalize()}"
+            print(row)
 
-            # to remove spaces in between list items we can do this:
-            ### new_todos = [item.strip('\n') for item in todolist]
-            # or we can just write item = item.strip('\n') as shown below
+    elif user_action.startswith("edit"):
+        try:
+            number = int(user_action[5:])
+            # user does not know that list starts with index 0 instead of 1
+            # so, we adjust for this and say number (which could be 1) -1 so its then 0
+            print(number)
+            number = number - 1
 
-            # then amend the enumerate for new_todos only
-            for index, item in enumerate(todolist):
-                item = item.strip('\n')
-                #to be more client friendly we say index starts with 1
-                row = f"{index + 1}.{item.capitalize()}"
-                print(row)
-            print(f"The length of the list is {index + 1}")
+            todolist = functions.get_todos()
 
-    elif user_action == "edit":
-        number = int(input("Number of the todo you would like to edit: "))
-        # user does not know that list starts with index 0 instead of 1
-        # so, we adjust for this and say number (which could be 1) -1 so its then 0
-        number = number - 1
+            newtodo = input("Enter new todo: ")
+            # had to add in \n since it didn't have that when I ran it the first time
+            todolist[number] = newtodo + '\n'
 
-        with open('todolist.txt', "r") as file:
-            todolist = file.readlines()
+            functions.write_todos(todolist)
 
-        newtodo = input("Enter new todo: ")
-        #had to add in \n since it didn't have that when I ran it the first time
-        todolist[number] = newtodo + '\n'
+        except ValueError:
+            print("Your command is not valid.")
+            continue
 
-        with open('todolist.txt', 'w') as file:
-            file.writelines(todolist)
+    elif user_action.startswith("complete"):
+        try:
+            number = int(user_action[9:])
 
-    elif user_action == "complete":
-        number = int(input("Number of the todo to complete: "))
+            todolist = functions.get_todos()
+            index = number - 1
+            todo_to_remove = todolist[index].strip('\n')
+            todolist.pop(index)
 
-        with open('todolist.txt', "r") as file:
-            todolist = file.readlines()
-        index = number - 1
-        todo_to_remove = todolist[index].strip('\n')
-        todolist.pop(index)
+            functions.write_todos(todolist)
 
-        with open('todolist.txt', 'w') as file:
-            file.writelines(todolist)
+            message = f"Todo: '{todo_to_remove}' was removed from the list"
+            print(message)
+        except IndexError:
+            print("There is no item with that number")
+            continue
+        except ValueError:
+            print("Your command is not valid.")
+            continue
 
-        message = f"Todo: '{todo_to_remove}' was removed from the list"
-        print(message)
-
-    elif user_action == "exit":
+    elif user_action.startswith("exit"):
         break
 
     else:
-        input("Please type either add, show or exit: ")
+        input("Command is not valid:")
